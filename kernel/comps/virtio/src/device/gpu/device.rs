@@ -833,7 +833,7 @@ fn init_frame_buffer(device: Arc<GPUDevice>) {
     for x in 0..height {
         for y in 0..width {
             let offset = (x * width + y) * 4;
-            let color = 0x0000_0000
+            let color = 0x0000_0000;
             buf.write_val(offset as usize, &color).unwrap();
         }
     }
