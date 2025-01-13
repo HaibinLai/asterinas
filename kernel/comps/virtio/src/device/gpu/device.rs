@@ -385,7 +385,7 @@ impl GPUDevice {
         let rect = display_info.get_rect(0).unwrap();
 
         // create resource 2d
-        self.resource_create_2d(RESOURCE_ID_FB, rect.width(), rect.height())?;
+        self.resource_create_2d(RESOURCE_ID_FB.try_into().unwrap(), rect.width(), rect.height())?;
 
         // alloc continuous memory for framebuffer
         // Each pixel is 4 bytes (32 bits) in RGBA format.
