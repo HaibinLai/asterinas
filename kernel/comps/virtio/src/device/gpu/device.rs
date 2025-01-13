@@ -20,7 +20,7 @@ use crate::{
     device::{
         gpu::{
             control::{
-                VirtioGpuGetEdid, VirtioGpuRespEdid, VirtioGpuRespResourceCreate2D, RESPONSE_SIZE,
+                VirtioGpuCursorPos, VirtioGpuGetEdid, VirtioGpuRespEdid, VirtioGpuRespResourceCreate2D, RESPONSE_SIZE
             },
             header::{VirtioGpuCtrlType, REQUEST_SIZE},
         },
@@ -679,7 +679,8 @@ impl GPUDevice {
                 0,
                 size_of::<VirtioGpuUpdateCursor>(),
             );
-            let req_data = VirtioGpuUpdateCursor::new(resource_id, scanout_id, pos_x, pos_y, hot_x, hot_y);
+            let cursor_pos = VirtioGpuCursorPos::new(scanout_id, 0, 0);
+            let req_data = VirtioGpuUpdateCursor::new(cursor_pos, 0xdade, 32, 32);
             req_data_slice.write_val(0, &req_data).unwrap();
             req_data_slice.sync().unwrap();
             req_data_slice
@@ -757,9 +758,12 @@ fn test_cursor(device: Arc<GPUDevice>) {
     device.transfer_to_host_2d(cursor_rect, 0, 0xdade).unwrap();
 
     early_println!("cursor setup done");
+    // wait for some time 
+    for _ in 0..1000000 {
+    }
 
     // update current cursor
-    // device.update_cursor(0xdade, 0, 0, 0, 0, 0, false).unwrap();
+    device.update_cursor(0xdade, 0, 0, 0, 0, 0, false).unwrap();
 
 
 
