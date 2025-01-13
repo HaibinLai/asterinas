@@ -841,26 +841,25 @@ fn init_frame_buffer(device: Arc<GPUDevice>) {
     //         buf.write_val(offset as usize, &color).unwrap();
     //     }
     // }
-    let cx = width / 2;
-    let cy = height / 2;
-    let radius = 100;
+
+
+    let positions = [
+    (10, 35), (10, 36), (10, 37), (10, 38), (10, 39), (10, 40), (10, 41), (10, 42),
+    (10, 43), (10, 44), (10, 45), (10, 46), (10, 47), (11, 0), (11, 1), (11, 2),
+    (11, 3), (11, 4), (11, 5), (11, 6), (11, 7)
+];
+
+let color = 0xFDFBEC; // Color 253, 255, 238 in RGB Hex format
+
+
+for (x, y) in positions.iter() {
+    // offset
+    let offset = (*y * width + *x) * 4;
     
-    for y in 0..height {
-        for x in 0..width {
-            let offset = (y * width + x) * 4;
-    
-            // Check if the pixel (x, y) lies within the circle
-            let dx = x as f32 - cx as f32;
-            let dy = y as f32 - cy as f32;
-            if (dx * dx + dy * dy) <= (radius * radius) as f32 {
-                let color = 0x00ff_0000; // Red color for the circle
-                buf.write_val(offset as usize, &color).expect("error writing frame buffer");
-            } else {
-                let color = 0x0000_ff00; // Green background color
-                buf.write_val(offset as usize, &color).expect("error writing frame buffer");
-            }
-        }
-    }
+    // write color to frame buffer
+    buf.write_val(offset as usize, &color).expect("error writing frame buffer");
+}
+
 
     // flush to screen
     device.flush().expect("failed to flush");
