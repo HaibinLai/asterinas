@@ -158,8 +158,9 @@ impl GPUDevice {
 
         // Taojie: we directly test gpu functionality here rather than writing a user application.
         // Test device
-        test_frame_buffer(Arc::clone(&device));
-        test_cursor(Arc::clone(&device));
+        // test_frame_buffer(Arc::clone(&device));
+        init_frame_buffer(Arc::clone(&device));
+        // test_cursor(Arc::clone(&device));
         Ok(())
     }
 
@@ -805,6 +806,59 @@ fn test_frame_buffer(device: Arc<GPUDevice>) {
             buf.write_val(offset as usize, &x).expect("error writing frame buffer");
             buf.write_val((offset + 1) as usize, &y).expect("error writing frame buffer");
             buf.write_val((offset + 2) as usize, &(x+y)).expect("error writing frame buffer");
+        }
+    }
+
+    // flush to screen
+    device.flush().expect("failed to flush");
+    early_println!("flushed to screen");
+}
+
+
+/// Test the functionality of gpu device and driver.
+fn init_frame_buffer(device: Arc<GPUDevice>) {
+    // get resolution
+    let (width, height) = device.resolution().expect("failed to get resolution");
+    early_println!("[INFO] resolution: {}x{}", width, height);
+
+    // test: get edid info
+    device.request_edid_info().expect("failed to get edid info");
+
+    // setup framebuffer
+    let buf = device
+        .setup_framebuffer()
+        .expect("failed to setup framebuffer");
+
+    // write content into buffer
+    // for x in 0..height {
+    //     for y in 0..width {
+    //         let offset = (x * width + y) * 4;
+    //         let color = if x % 2 == 0 && y % 2 == 0 {
+    //             0x00ff_0000
+    //         } else {
+    //             0x0000_ff00
+    //         };
+    //         buf.write_val(offset as usize, &color).unwrap();
+    //     }
+    // }
+    let cx = width / 2;
+    let cy = height / 2;
+    let radius = 100;
+    
+    for y in 0..height {
+        for x in 0..width {
+            let offset = (y * width + x) * 4;
+    
+            // Check if the pixel (x, y) lies within the circle
+            let dx = x as f32 - cx as f32;
+            let dy = y as f32 - cy as f32;
+            if (dx * dx + dy * dy) <= (radius * radius) as f32 {
+                let color = 0x00ff_0000; // Red color for the circle
+                buf.write_val(offset as usize, &color).expect("error writing frame buffer");
+            } else {
+                let color = 0x0000_ff00; // Green background color
+                buf.write_val(offset as usize, &color).expect("error writing frame buffer");
+            }
         }
     }
 
