@@ -813,4 +813,4 @@ fn test_frame_buffer(device: Arc<GPUDevice>) {
     early_println!("flushed to screen");
 }
 
-const RESOURCE_ID_FB: u32 = 0xbabe;
+const RESOURCE_ID_FB: i32 = 0xbabe;
