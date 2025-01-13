@@ -853,19 +853,19 @@ fn init_frame_buffer(device: Arc<GPUDevice>) {
 let color = 0xFDFBEC; // Color 253, 255, 238 in RGB Hex format
 
 
-for (x, y) in positions.iter() {
-    // offset
-    let offset = (x * width + y) * 4;
-    let offset2 = (x * width + x + y) * 4;
-    let offset3 = (x * width + x+ x + y) * 4;
-    let offset4 = (x * width + x+ x+ x + y) * 4;
+// for (x, y) in positions.iter() {
+//     // offset
+//     let offset = (x * width + y) * 4;
+//     let offset2 = (x * width + x + y) * 4;
+//     let offset3 = (x * width + x+ x + y) * 4;
+//     let offset4 = (x * width + x+ x+ x + y) * 4;
     
-    // write color to frame buffer
-    buf.write_val(offset as usize, &color).expect("error writing frame buffer");
-    buf.write_val(offset2 as usize, &color).expect("error writing frame buffer");
-    buf.write_val(offset3 as usize, &color).expect("error writing frame buffer");
-    buf.write_val(offset4 as usize, &color).expect("error writing frame buffer");
-}
+//     // write color to frame buffer
+//     buf.write_val(offset as usize, &color).expect("error writing frame buffer");
+//     buf.write_val(offset2 as usize, &color).expect("error writing frame buffer");
+//     buf.write_val(offset3 as usize, &color).expect("error writing frame buffer");
+//     buf.write_val(offset4 as usize, &color).expect("error writing frame buffer");
+// }
 
 
     // flush to screen
