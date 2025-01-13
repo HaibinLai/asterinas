@@ -385,7 +385,7 @@ impl GPUDevice {
         let rect = display_info.get_rect(0).unwrap();
 
         // create resource 2d
-        self.resource_create_2d(0xbabe, rect.width(), rect.height())?;
+        self.resource_create_2d(RESOURCE_ID_FB, rect.width(), rect.height())?;
 
         // alloc continuous memory for framebuffer
         // Each pixel is 4 bytes (32 bits) in RGBA format.
@@ -398,10 +398,10 @@ impl GPUDevice {
 
         // attach backing storage
         // TODO: (Taojie) excapsulate 0xbabe
-        self.resource_attch_backing(0xbabe, frame_buffer_dma.paddr(), size as u32)?;
+        self.resource_attch_backing(RESOURCE_ID_FB, frame_buffer_dma.paddr(), size as u32)?;
 
         // map frame buffer to screen
-        self.set_scanout(rect, 0, 0xbabe)?;
+        self.set_scanout(rect, 0, RESOURCE_ID_FB)?;
 
         // return dma to be written
         Ok(Arc::new(frame_buffer_dma))
@@ -547,10 +547,10 @@ impl GPUDevice {
         let rect = display_info.get_rect(0).unwrap();
 
         // transfer from guest memmory to host resource
-        self.transfer_to_host_2d(rect, 0, 0xbabe)?;
+        self.transfer_to_host_2d(rect, 0, RESOURCE_ID_FB)?;
 
         // resource flush
-        self.resource_flush(rect, 0xbabe)?;
+        self.resource_flush(rect, RESOURCE_ID_FB)?;
         Ok(())
     }
 
@@ -812,3 +812,5 @@ fn test_frame_buffer(device: Arc<GPUDevice>) {
     device.flush().expect("failed to flush");
     early_println!("flushed to screen");
 }
+
+const RESOURCE_ID_FB: u32 = 0xbabe;
