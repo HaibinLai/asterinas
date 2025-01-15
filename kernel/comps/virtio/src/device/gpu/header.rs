@@ -1,9 +1,43 @@
 use core::mem::size_of;
 
-use int_to_c_enum::TryFromInt;
 use ostd::Pod;
 
 pub(crate) const REQUEST_SIZE: usize = size_of::<VirtioGpuCtrlHdr>();
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)] // TODO: do we need TryFromInt?
+#[repr(u32)]
+#[allow(non_camel_case_types)]
+pub enum VirtioGpuCtrlType {
+    /* 2d commands */
+    /// Retrieve the current output configuration. No request data (just bare struct virtio_gpu_ctrl_hdr).
+    ///  Response type is VIRTIO_GPU_RESP_OK_DISPLAY_INFO, response data is struct virtio_gpu_resp_display_info.
+    VIRTIO_GPU_CMD_GET_DISPLAY_INFO = 0x0100,
+    VIRTIO_GPU_CMD_RESOURCE_CREATE_2D,
+    VIRTIO_GPU_CMD_RESOURCE_UNREF,
+    VIRTIO_GPU_CMD_SET_SCANOUT,
+    VIRTIO_GPU_CMD_RESOURCE_FLUSH,
+    VIRTIO_GPU_CMD_TRANSFER_TO_HOST_2D,
+    VIRTIO_GPU_CMD_RESOURCE_ATTACH_BACKING,
+    VIRTIO_GPU_CMD_RESOURCE_DETACH_BACKING,
+    VIRTIO_GPU_CMD_GET_CAPSET_INFO,
+    VIRTIO_GPU_CMD_GET_CAPSET,
+    VIRTIO_GPU_CMD_GET_EDID,
+    VIRTIO_GPU_CMD_RESOURCE_ASSIGN_UUID,
+    VIRTIO_GPU_CMD_CTX_CREATE,
+
+    /* 3d commands */
+    // TODO:
+
+    /* cursor commands */
+    VIRTIO_GPU_CMD_UPDATE_CURSOR = 0x0300,
+    VIRTIO_GPU_CMD_MOVE_CURSOR,
+
+    /* success responses */
+    VIRTIO_GPU_RESP_OK_NODATA = 0x1100,
+    VIRTIO_GPU_RESP_OK_EDID = 0x1104,
+    /* error responses */
+    // TODO:
+}
 
 /// All requests and responses on the virt queues have a fixed header using the following layout structure.
 /// Referece: spec 5.7.6.7 Device Operation: Request header
@@ -29,10 +63,10 @@ pub struct VirtioGpuCtrlHdr {
     pub padding: [u8; 3],
 }
 
-impl Default for VirtioGpuCtrlHdr {
-    fn default() -> Self {
+impl VirtioGpuCtrlHdr {
+    pub(crate) fn from_type(type_: VirtioGpuCtrlType) -> VirtioGpuCtrlHdr {
         VirtioGpuCtrlHdr {
-            type_: VirtioGpuCtrlType::VIRTIO_GPU_CMD_GET_DISPLAY_INFO as u32,
+            type_: type_ as u32,
             flags: 0,
             fence_id: 0,
             ctx_id: 0,
@@ -42,24 +76,15 @@ impl Default for VirtioGpuCtrlHdr {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, TryFromInt)]
-#[repr(u32)]
-#[allow(non_camel_case_types)]
-pub enum VirtioGpuCtrlType {
-    /* 2d commands */
-    /// Retrieve the current output configuration. No request data (just bare struct virtio_gpu_ctrl_hdr).
-    ///  Response type is VIRTIO_GPU_RESP_OK_DISPLAY_INFO, response data is struct virtio_gpu_resp_display_info.
-    VIRTIO_GPU_CMD_GET_DISPLAY_INFO = 0x0100,
-    /* 3d commands */
-    // TODO:
-
-    /* cursor commands */
-    // VIRTIO_GPU_CMD_UPDATE_CURSOR = 0x0300,
-    // VIRTIO_GPU_CMD_MOVE_CURSOR = 0x0301,
-
-    /* success responses */
-    // TODO:
-
-    /* error responses */
-    // TODO:
+impl Default for VirtioGpuCtrlHdr {
+    fn default() -> Self {
+        VirtioGpuCtrlHdr {
+            type_: 0,
+            flags: 0,
+            fence_id: 0,
+            ctx_id: 0,
+            ring_idx: 0,
+            padding: [0; 3],
+        }
+    }
 }
